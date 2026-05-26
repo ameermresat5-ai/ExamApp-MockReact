@@ -4,11 +4,15 @@ import { authService } from "./services/AuthService";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NavigationMenu from "./components/common/NavigationMenu";
+import TeacherDashboard from "./components/teacher/TeacherDashboard";
+import ExamList from "./components/teacher/ExamList";
+import ExamForm from "./components/teacher/ExamForm";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
   const [authPage, setAuthPage] = useState("login");
   const [currentPage, setCurrentPage] = useState("dashboard");
+  const [selectedExam, setSelectedExam] = useState(null);
 
   function handleLogin(user) {
     setCurrentUser(user);
@@ -25,54 +29,97 @@ function App() {
     setCurrentUser(null);
     setAuthPage("login");
     setCurrentPage("dashboard");
+    setSelectedExam(null);
   }
 
-  function getPageTitle() {
-    if (currentPage === "dashboard") {
-      return `${currentUser.role} Dashboard`;
-    }
+  function handleNavigate(page) {
+    setCurrentPage(page);
 
-    if (currentPage === "teacher-exams") {
-      return "Teacher Exams";
+    if (page !== "create-exam") {
+      setSelectedExam(null);
     }
-
-    if (currentPage === "create-exam") {
-      return "Create Exam";
-    }
-
-    if (currentPage === "available-exams") {
-      return "Available Exams";
-    }
-
-    if (currentPage === "my-submissions") {
-      return "My Submissions";
-    }
-
-    return "Dashboard";
   }
 
-  function getPageDescription() {
+  function handleEditExam(exam) {
+    setSelectedExam(exam);
+    setCurrentPage("create-exam");
+  }
+
+  function handleExamSaved() {
+    setSelectedExam(null);
+    setCurrentPage("teacher-exams");
+  }
+
+  function renderDashboard() {
+    if (currentUser.role === "teacher") {
+      return (
+        <TeacherDashboard
+          currentUser={currentUser}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
+
+    return (
+      <section className="page-container">
+        <div className="page-header">
+          <h1>Student Dashboard</h1>
+          <p>
+            Student pages will be added in the next module.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  function renderPage() {
     if (currentPage === "dashboard") {
-      return "This is the main page after login. The next modules will add real teacher and student features.";
+      return renderDashboard();
     }
 
-    if (currentPage === "teacher-exams") {
-      return "Here the teacher will view, edit, and manage exams.";
+    if (currentUser.role === "teacher" && currentPage === "teacher-exams") {
+      return (
+        <ExamList
+          currentUser={currentUser}
+          onEditExam={handleEditExam}
+        />
+      );
     }
 
-    if (currentPage === "create-exam") {
-      return "Here the teacher will create a new exam.";
+    if (currentUser.role === "teacher" && currentPage === "create-exam") {
+      return (
+        <ExamForm
+          currentUser={currentUser}
+          examToEdit={selectedExam}
+          onSaved={handleExamSaved}
+          onCancel={() => handleNavigate("teacher-exams")}
+        />
+      );
     }
 
-    if (currentPage === "available-exams") {
-      return "Here the student will view published exams.";
+    if (currentUser.role === "student" && currentPage === "available-exams") {
+      return (
+        <section className="page-container">
+          <div className="page-header">
+            <h1>Available Exams</h1>
+            <p>Student exam list will be added in the next module.</p>
+          </div>
+        </section>
+      );
     }
 
-    if (currentPage === "my-submissions") {
-      return "Here the student will view submitted exams and results.";
+    if (currentUser.role === "student" && currentPage === "my-submissions") {
+      return (
+        <section className="page-container">
+          <div className="page-header">
+            <h1>My Submissions</h1>
+            <p>Student submissions will be added in the next module.</p>
+          </div>
+        </section>
+      );
     }
 
-    return "";
+    return renderDashboard();
   }
 
   if (!currentUser && authPage === "register") {
@@ -98,26 +145,12 @@ function App() {
       <NavigationMenu
         currentUser={currentUser}
         currentPage={currentPage}
-        onNavigate={setCurrentPage}
+        onNavigate={handleNavigate}
         onLogout={handleLogout}
       />
 
       <main className="app-page">
-        <section className="dashboard-card wide-card">
-          <h1>{getPageTitle()}</h1>
-
-          <p>
-            Welcome, <strong>{currentUser.name}</strong>.
-          </p>
-
-          <div className="user-box">
-            <p><strong>Email:</strong> {currentUser.email}</p>
-            <p><strong>Role:</strong> {currentUser.role}</p>
-            <p><strong>User ID:</strong> {currentUser.id}</p>
-          </div>
-
-          <p>{getPageDescription()}</p>
-        </section>
+        {renderPage()}
       </main>
     </div>
   );
