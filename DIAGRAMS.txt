@@ -1,0 +1,268 @@
+Project Diagrams
+ExamApp Mock React
+
+==================================================
+1. Components Hierarchy
+==================================================
+
+App
+|
+|-- NavigationMenu
+|
+|-- LoginPage
+|   |
+|   |-- LoginForm
+|
+|-- RegisterPage
+|   |
+|   |-- RegisterForm
+|
+|-- TeacherDashboard
+|
+|-- ExamList
+|   |
+|   |-- ExamCard
+|
+|-- ExamForm
+|
+|-- StudentDashboard
+|
+|-- AvailableExams
+|
+|-- ExamDetails
+|
+|-- TakeExam
+|
+|-- MySubmissions
+
+
+==================================================
+2. UML for Main Services
+==================================================
+
++------------------+
+| ConfigService    |
++------------------+
+| - config         |
++------------------+
+| + get(key)       |
+| + set(key,value) |
+| + getAll()       |
++------------------+
+
++----------------------+
+| LoggerService        |
++----------------------+
+| - logs               |
++----------------------+
+| + info(message,data) |
+| + warn(message,data) |
+| + error(message,data)|
+| + getLogs()          |
+| + clear()            |
++----------------------+
+
++----------------------------+
+| StorageService             |
++----------------------------+
+| - memoryStorage            |
+| - prefix                   |
++----------------------------+
+| + set(key,value)           |
+| + get(key,defaultValue)    |
+| + remove(key)              |
+| + clearAppStorage()        |
++----------------------------+
+
++----------------------+
+| NotifyService        |
++----------------------+
+| - listeners          |
+| - notifications      |
++----------------------+
+| + subscribe(listener)|
+| + success(message)   |
+| + error(message)     |
+| + info(message)      |
+| + getAll()           |
+| + clear()            |
++----------------------+
+
++-----------------------------+
+| MockDbService               |
++-----------------------------+
+| - usersKey                  |
+| - examsKey                  |
+| - submissionsKey            |
++-----------------------------+
+| + getUsers()                |
+| + addUser(user)             |
+| + findUserByEmail(email)    |
+| + getExams()                |
+| + getExamById(id)           |
+| + addExam(exam)             |
+| + updateExam(id,exam)       |
+| + deleteExam(id)            |
+| + getSubmissions()          |
+| + addSubmission(submission) |
++-----------------------------+
+
++-----------------------------+
+| AuthService                 |
++-----------------------------+
+| - currentUserKey            |
++-----------------------------+
+| + login(email,password)     |
+| + register(userData)        |
+| + logout()                  |
+| + getCurrentUser()          |
+| + isLoggedIn()              |
+| + removePassword(user)      |
++-----------------------------+
+
++-----------------------------+
+| ExamService                 |
++-----------------------------+
+| + getAllExams()             |
+| + getTeacherExams(id)       |
+| + getPublishedExams()       |
+| + getExamById(id)           |
+| + createExam(data,id)       |
+| + updateExam(id,data)       |
+| + changeExamStatus(id,st)   |
+| + deleteExam(id)            |
++-----------------------------+
+
++---------------------------------+
+| SubmissionService               |
++---------------------------------+
+| + getAllSubmissions()           |
+| + getStudentSubmissions(id)     |
+| + getSubmissionForExam(s,e)     |
+| + hasStudentSubmitted(s,e)      |
+| + calculateGrade(exam,answers)  |
+| + submitExam(exam,id,answers)   |
++---------------------------------+
+
+
+==================================================
+3. Main Mock DB Entities
+==================================================
+
++----------------+
+| User           |
++----------------+
+| id             |
+| name           |
+| email          |
+| password       |
+| role           |
++----------------+
+
++----------------+
+| Exam           |
++----------------+
+| id             |
+| title          |
+| description    |
+| status         |
+| teacherId      |
+| questions      |
++----------------+
+
++----------------+
+| Question       |
++----------------+
+| id             |
+| text           |
+| options        |
+| correctAnswer  |
++----------------+
+
++----------------+
+| Submission     |
++----------------+
+| id             |
+| examId         |
+| examTitle      |
+| studentId      |
+| answers        |
+| grade          |
+| totalQuestions |
+| submittedAt    |
++----------------+
+
+
+==================================================
+4. Entity Relationships
+==================================================
+
+Teacher User 1 -------- creates -------- many Exams
+
+Student User 1 -------- submits ------- many Submissions
+
+Exam 1 ---------------- contains ------ many Questions
+
+Exam 1 ---------------- has ----------- many Submissions
+
+Submission many ------- belongs to ---- 1 Student User
+
+Submission many ------- belongs to ---- 1 Exam
+
+
+==================================================
+5. Use Case Diagram - Text Version
+==================================================
+
+Actors:
+- Teacher
+- Student
+
+Teacher Use Cases:
+Teacher --> Login
+Teacher --> Register
+Teacher --> Open Teacher Dashboard
+Teacher --> Create Exam
+Teacher --> Edit Exam
+Teacher --> View Exams
+Teacher --> Change Exam Status
+Teacher --> Delete Exam
+
+Student Use Cases:
+Student --> Login
+Student --> Register
+Student --> Open Student Dashboard
+Student --> View Available Exams
+Student --> Open Exam Details
+Student --> Take Exam
+Student --> Submit Exam
+Student --> View My Submissions
+Student --> View Grade
+
+
+==================================================
+6. Client Flow
+==================================================
+
+User opens app
+|
+|-- If user is not logged in:
+|      |
+|      |-- Login Page
+|      |-- Register Page
+|
+|-- If user is Teacher:
+|      |
+|      |-- Teacher Dashboard
+|      |-- My Exams
+|      |-- Create Exam
+|      |-- Edit Exam
+|      |-- Change Status
+|
+|-- If user is Student:
+       |
+       |-- Student Dashboard
+       |-- Available Exams
+       |-- Exam Details
+       |-- Take Exam
+       |-- My Submissions
