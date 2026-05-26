@@ -416,3 +416,57 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+.details-box {
+  background: #eef2ff;
+  padding: 18px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+}
+
+.details-box p {
+  margin: 8px 0;
+}
+
+.question-preview-list {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.take-exam-form {
+  display: grid;
+  gap: 18px;
+}
+
+.options-list {
+  display: grid;
+  gap: 10px;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.option-row input {
+  width: auto;
+}
+
+.grade-badge {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+}

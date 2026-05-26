@@ -7,6 +7,11 @@ import NavigationMenu from "./components/common/NavigationMenu";
 import TeacherDashboard from "./components/teacher/TeacherDashboard";
 import ExamList from "./components/teacher/ExamList";
 import ExamForm from "./components/teacher/ExamForm";
+import StudentDashboard from "./components/student/StudentDashboard";
+import AvailableExams from "./components/student/AvailableExams";
+import ExamDetails from "./components/student/ExamDetails";
+import TakeExam from "./components/student/TakeExam";
+import MySubmissions from "./components/student/MySubmissions";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
@@ -35,7 +40,7 @@ function App() {
   function handleNavigate(page) {
     setCurrentPage(page);
 
-    if (page !== "create-exam") {
+    if (page !== "create-exam" && page !== "exam-details" && page !== "take-exam") {
       setSelectedExam(null);
     }
   }
@@ -50,6 +55,21 @@ function App() {
     setCurrentPage("teacher-exams");
   }
 
+  function handleViewExam(exam) {
+    setSelectedExam(exam);
+    setCurrentPage("exam-details");
+  }
+
+  function handleTakeExam(exam) {
+    setSelectedExam(exam);
+    setCurrentPage("take-exam");
+  }
+
+  function handleExamSubmitted() {
+    setSelectedExam(null);
+    setCurrentPage("my-submissions");
+  }
+
   function renderDashboard() {
     if (currentUser.role === "teacher") {
       return (
@@ -61,23 +81,15 @@ function App() {
     }
 
     return (
-      <section className="page-container">
-        <div className="page-header">
-          <h1>Student Dashboard</h1>
-          <p>
-            Student pages will be added in the next module.
-          </p>
-        </div>
-      </section>
+      <StudentDashboard
+        currentUser={currentUser}
+        onNavigate={handleNavigate}
+      />
     );
   }
 
-  function renderPage() {
-    if (currentPage === "dashboard") {
-      return renderDashboard();
-    }
-
-    if (currentUser.role === "teacher" && currentPage === "teacher-exams") {
+  function renderTeacherPage() {
+    if (currentPage === "teacher-exams") {
       return (
         <ExamList
           currentUser={currentUser}
@@ -86,7 +98,7 @@ function App() {
       );
     }
 
-    if (currentUser.role === "teacher" && currentPage === "create-exam") {
+    if (currentPage === "create-exam") {
       return (
         <ExamForm
           currentUser={currentUser}
@@ -97,26 +109,60 @@ function App() {
       );
     }
 
-    if (currentUser.role === "student" && currentPage === "available-exams") {
+    return renderDashboard();
+  }
+
+  function renderStudentPage() {
+    if (currentPage === "available-exams") {
       return (
-        <section className="page-container">
-          <div className="page-header">
-            <h1>Available Exams</h1>
-            <p>Student exam list will be added in the next module.</p>
-          </div>
-        </section>
+        <AvailableExams
+          currentUser={currentUser}
+          onViewExam={handleViewExam}
+          onTakeExam={handleTakeExam}
+        />
       );
     }
 
-    if (currentUser.role === "student" && currentPage === "my-submissions") {
+    if (currentPage === "exam-details" && selectedExam) {
       return (
-        <section className="page-container">
-          <div className="page-header">
-            <h1>My Submissions</h1>
-            <p>Student submissions will be added in the next module.</p>
-          </div>
-        </section>
+        <ExamDetails
+          currentUser={currentUser}
+          exam={selectedExam}
+          onBack={() => handleNavigate("available-exams")}
+          onTakeExam={handleTakeExam}
+        />
       );
+    }
+
+    if (currentPage === "take-exam" && selectedExam) {
+      return (
+        <TakeExam
+          currentUser={currentUser}
+          exam={selectedExam}
+          onSubmitted={handleExamSubmitted}
+          onCancel={() => handleNavigate("available-exams")}
+        />
+      );
+    }
+
+    if (currentPage === "my-submissions") {
+      return <MySubmissions currentUser={currentUser} />;
+    }
+
+    return renderDashboard();
+  }
+
+  function renderPage() {
+    if (currentPage === "dashboard") {
+      return renderDashboard();
+    }
+
+    if (currentUser.role === "teacher") {
+      return renderTeacherPage();
+    }
+
+    if (currentUser.role === "student") {
+      return renderStudentPage();
     }
 
     return renderDashboard();
