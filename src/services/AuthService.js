@@ -1,3 +1,6 @@
+// שירות התחברות והרשמה.
+// השירות אחראי על login, register, logout ושמירת המשתמש המחובר.
+
 import { mockDbService } from "./MockDbService";
 import { storageService } from "./StorageService";
 import { loggerService } from "./LoggerService";

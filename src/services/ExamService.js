@@ -1,3 +1,6 @@
+// שירות ניהול מבחנים.
+// השירות מרכז פעולות של יצירה, עריכה, מחיקה ושינוי סטטוס של מבחנים.
+
 import { mockDbService } from "./MockDbService";
 import { loggerService } from "./LoggerService";
 import { notifyService } from "./NotifyService";

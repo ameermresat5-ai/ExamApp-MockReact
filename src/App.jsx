@@ -1,3 +1,6 @@
+// הקומפוננטה הראשית של האפליקציה.
+// כאן מתבצע ניהול המשתמש המחובר, ניווט בין דפים וחיבור בין המודולים.
+
 import { useState } from "react";
 import "./App.css";
 import { authService } from "./services/AuthService";

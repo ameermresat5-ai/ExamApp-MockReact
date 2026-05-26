@@ -1,3 +1,6 @@
+// שירות שמירה וקריאה מה-localStorage.
+// השירות מפריד את לוגיקת השמירה מהקומפוננטות כדי לשמור על קוד מודולרי.
+
 import { configService } from "./ConfigService";
 
 class StorageService {
