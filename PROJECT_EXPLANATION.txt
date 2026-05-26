@@ -1,0 +1,198 @@
+Project Name:
+ExamApp Mock React
+
+Project Description:
+ExamApp Mock React is a client-side React application for managing exams.
+The project does not use a real backend server. Instead, it uses mock data and service classes to simulate database and API behavior.
+The purpose of the project is to practice modular React development, Git branches, feature-based commits, services, authentication, teacher pages, student pages, and mock database logic.
+
+Main Users:
+1. Teacher
+2. Student
+
+Teacher Use Cases:
+1. Teacher can login.
+2. Teacher can register.
+3. Teacher can open the teacher dashboard.
+4. Teacher can view exam statistics.
+5. Teacher can create a new exam.
+6. Teacher can edit an existing exam.
+7. Teacher can view all teacher exams.
+8. Teacher can change exam status.
+9. Teacher can delete an exam.
+
+Student Use Cases:
+1. Student can login.
+2. Student can register.
+3. Student can open the student dashboard.
+4. Student can view available published exams.
+5. Student can open exam details.
+6. Student can take an exam.
+7. Student can submit answers.
+8. Student can view submitted exams.
+9. Student can view grades.
+
+Main Pages and Components:
+1. Login Page:
+Used for user login with email and password.
+
+2. Register Page:
+Used for creating a new teacher or student account.
+
+3. Navigation Menu:
+Shows different menu items according to the user role.
+Teacher sees teacher pages.
+Student sees student pages.
+
+4. Teacher Dashboard:
+Shows statistics about teacher exams, such as total exams, draft exams, published exams, and closed exams.
+
+5. Teacher Exams Page:
+Shows the list of teacher exams.
+The teacher can edit, delete, and change exam status.
+
+6. Create/Edit Exam Page:
+Used by the teacher to create or edit an exam.
+The form supports exam title, description, status, questions, options, and correct answer.
+
+7. Student Dashboard:
+Shows student statistics, available exams, submitted exams, and average grade.
+
+8. Available Exams Page:
+Shows only published exams that students can take.
+
+9. Exam Details Page:
+Shows exam information and a preview of questions.
+
+10. Take Exam Page:
+Allows the student to answer all questions and submit the exam.
+
+11. My Submissions Page:
+Shows the exams submitted by the student and their grades.
+
+Main Services:
+1. ConfigService:
+Stores general application configuration, such as app name, version, and storage prefix.
+
+2. LoggerService:
+Handles logs for actions, warnings, and errors.
+
+3. StorageService:
+Handles saving and loading data from localStorage.
+It also supports memory storage fallback.
+
+4. NotifyService:
+Handles simple notification messages, such as success, error, and info.
+
+5. MockDbService:
+Simulates database behavior.
+It stores users, exams, and submissions using localStorage.
+
+6. AuthService:
+Handles login, register, logout, and current user logic.
+
+7. ExamService:
+Handles exam logic, including create exam, update exam, delete exam, get exams, and change exam status.
+
+8. SubmissionService:
+Handles student submissions, grade calculation, checking if a student already submitted, and saving submissions.
+
+Main Mock Database Entities:
+1. User:
+Fields:
+- id
+- name
+- email
+- password
+- role
+
+2. Exam:
+Fields:
+- id
+- title
+- description
+- status
+- teacherId
+- questions
+
+3. Question:
+Fields:
+- id
+- text
+- options
+- correctAnswer
+
+4. Submission:
+Fields:
+- id
+- examId
+- examTitle
+- studentId
+- answers
+- grade
+- totalQuestions
+- submittedAt
+
+Git Workflow:
+The project uses Git branches and modular development.
+The main work is saved in the dev branch, not directly in main.
+Each module or feature is developed in a separate feature branch.
+
+Branches used:
+1. dev
+Main development branch.
+
+2. feature/services
+Used for generic services and mock data.
+
+3. feature/auth
+Used for login and register module.
+
+4. feature/navigation
+Used for navigation menu module.
+
+5. feature/teacher-pages
+Used for teacher pages and exam service.
+
+6. feature/student-pages
+Used for student pages and submission service.
+
+7. feature/project-explanation
+Used for this explanation text file.
+
+Commit Strategy:
+Each module is committed separately.
+This helps show clear progress and modular work.
+
+Important commits:
+1. Initialize React Vite project
+2. Add generic services and mock data
+3. Add auth login and register module
+4. Add navigation menu module
+5. Add teacher pages and exam service
+6. Add student pages and submission service
+7. Add project explanation text file
+
+Why the project is modular:
+The project separates logic into services and UI into React components.
+Services are responsible for data and business logic.
+Components are responsible for showing the user interface.
+This makes the project easier to understand, test, and extend.
+
+OOP Usage:
+The project uses classes in the service layer.
+Examples:
+- ConfigService
+- LoggerService
+- StorageService
+- NotifyService
+- MockDbService
+- AuthService
+- ExamService
+- SubmissionService
+
+The React components are functional components because this is the common style in modern React.
+
+Current Status:
+The client application includes authentication, navigation, teacher pages, student pages, mock database services, and exam submission logic.
+The project runs locally and builds successfully using npm run build.
