@@ -3,30 +3,83 @@ import "./App.css";
 import { authService } from "./services/AuthService";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import NavigationMenu from "./components/common/NavigationMenu";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
-  const [page, setPage] = useState("login");
+  const [authPage, setAuthPage] = useState("login");
+  const [currentPage, setCurrentPage] = useState("dashboard");
 
   function handleLogin(user) {
     setCurrentUser(user);
+    setCurrentPage("dashboard");
   }
 
   function handleRegister(user) {
     setCurrentUser(user);
+    setCurrentPage("dashboard");
   }
 
   function handleLogout() {
     authService.logout();
     setCurrentUser(null);
-    setPage("login");
+    setAuthPage("login");
+    setCurrentPage("dashboard");
   }
 
-  if (!currentUser && page === "register") {
+  function getPageTitle() {
+    if (currentPage === "dashboard") {
+      return `${currentUser.role} Dashboard`;
+    }
+
+    if (currentPage === "teacher-exams") {
+      return "Teacher Exams";
+    }
+
+    if (currentPage === "create-exam") {
+      return "Create Exam";
+    }
+
+    if (currentPage === "available-exams") {
+      return "Available Exams";
+    }
+
+    if (currentPage === "my-submissions") {
+      return "My Submissions";
+    }
+
+    return "Dashboard";
+  }
+
+  function getPageDescription() {
+    if (currentPage === "dashboard") {
+      return "This is the main page after login. The next modules will add real teacher and student features.";
+    }
+
+    if (currentPage === "teacher-exams") {
+      return "Here the teacher will view, edit, and manage exams.";
+    }
+
+    if (currentPage === "create-exam") {
+      return "Here the teacher will create a new exam.";
+    }
+
+    if (currentPage === "available-exams") {
+      return "Here the student will view published exams.";
+    }
+
+    if (currentPage === "my-submissions") {
+      return "Here the student will view submitted exams and results.";
+    }
+
+    return "";
+  }
+
+  if (!currentUser && authPage === "register") {
     return (
       <RegisterPage
         onRegister={handleRegister}
-        onGoToLogin={() => setPage("login")}
+        onGoToLogin={() => setAuthPage("login")}
       />
     );
   }
@@ -35,32 +88,38 @@ function App() {
     return (
       <LoginPage
         onLogin={handleLogin}
-        onGoToRegister={() => setPage("register")}
+        onGoToRegister={() => setAuthPage("register")}
       />
     );
   }
 
   return (
-    <main className="app-page">
-      <section className="dashboard-card">
-        <h1>Welcome, {currentUser.name}</h1>
-        <p>
-          You are logged in as <strong>{currentUser.role}</strong>.
-        </p>
+    <div className="app-layout">
+      <NavigationMenu
+        currentUser={currentUser}
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        onLogout={handleLogout}
+      />
 
-        <div className="user-box">
-          <p><strong>Email:</strong> {currentUser.email}</p>
-          <p><strong>User ID:</strong> {currentUser.id}</p>
-        </div>
+      <main className="app-page">
+        <section className="dashboard-card wide-card">
+          <h1>{getPageTitle()}</h1>
 
-        <p>
-          This is the first working auth module. Next we will add teacher pages,
-          student pages, navigation menu, and exam features.
-        </p>
+          <p>
+            Welcome, <strong>{currentUser.name}</strong>.
+          </p>
 
-        <button onClick={handleLogout}>Logout</button>
-      </section>
-    </main>
+          <div className="user-box">
+            <p><strong>Email:</strong> {currentUser.email}</p>
+            <p><strong>Role:</strong> {currentUser.role}</p>
+            <p><strong>User ID:</strong> {currentUser.id}</p>
+          </div>
+
+          <p>{getPageDescription()}</p>
+        </section>
+      </main>
+    </div>
   );
 }
 
