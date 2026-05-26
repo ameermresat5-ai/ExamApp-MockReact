@@ -1,3 +1,6 @@
+// שירות הודעות למשתמש.
+// השירות משמש להצגת הודעות הצלחה, שגיאה ומידע בצורה מרכזית.
+
 class NotifyService {
   constructor() {
     this.listeners = [];

@@ -1,3 +1,6 @@
+// שירות הגדרות כללי של המערכת.
+// כאן נשמרים ערכים קבועים כמו שם האפליקציה, גרסה וקידומת לשמירה ב-localStorage.
+
 class ConfigService {
   constructor() {
     this.config = {

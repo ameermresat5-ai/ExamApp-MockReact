@@ -1,3 +1,6 @@
+// שירות הגשות של סטודנטים.
+// השירות מחשב ציון, שומר הגשה ובודק אם הסטודנט כבר הגיש מבחן.
+
 import { mockDbService } from "./MockDbService";
 import { loggerService } from "./LoggerService";
 import { notifyService } from "./NotifyService";

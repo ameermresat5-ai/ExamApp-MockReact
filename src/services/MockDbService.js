@@ -1,3 +1,6 @@
+// שירות המדמה בסיס נתונים בצד הלקוח.
+// במקום שרת אמיתי, הנתונים נשמרים ונקראים מתוך localStorage.
+
 import { mockExams, mockSubmissions, mockUsers } from "../data/mockData";
 import { loggerService } from "./LoggerService";
 import { storageService } from "./StorageService";
