@@ -1,42 +1,121 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  color: #1f2937;
+}
+
+button {
+  cursor: pointer;
+}
+
+.auth-page,
+.app-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 32px;
+}
+
+.hero-section {
+  max-width: 420px;
+}
+
+.hero-section h1 {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.hero-section p {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.form-card,
+.dashboard-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+}
+
+.form-card h2,
+.dashboard-card h1 {
+  margin-top: 0;
+}
+
+.form-card label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.form-card input,
+.form-card select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.form-card button,
+.dashboard-card button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  background: #2563eb;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.link-button {
+  width: auto !important;
+  margin-top: 0 !important;
+  margin-left: 6px;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #2563eb !important;
+  font-weight: bold;
+}
+
+.error-message {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.small-text {
+  font-size: 14px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.demo-box,
+.user-box {
+  margin-top: 18px;
+  padding: 14px;
+  background: #eef2ff;
+  border-radius: 12px;
+  font-size: 14px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+@media (max-width: 800px) {
+  .auth-page {
+    flex-direction: column;
   }
-  to {
-    transform: rotate(360deg);
+
+  .hero-section {
+    text-align: center;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
