@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: examapp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: examapp
+      POSTGRES_USER: ameer
+      POSTGRES_PASSWORD: examapp_local_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - examapp_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ameer -d examapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  examapp_postgres_data:
