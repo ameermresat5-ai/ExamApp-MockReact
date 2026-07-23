@@ -1,13 +1,17 @@
-// שירות הגדרות כללי של המערכת.
-// כאן נשמרים ערכים קבועים כמו שם האפליקציה, גרסה וקידומת לשמירה ב-localStorage.
-
 class ConfigService {
   constructor() {
     this.config = {
       appName: "ExamApp Mock React",
       version: "1.0.0",
       storagePrefix: "examapp_mock_react",
-      defaultRole: "student"
+      defaultRole: "student",
+
+      // Change this value:
+      // "client" = localStorage only
+      // "server" = localStorage + Express API sync
+      dataMode: "server",
+
+      apiBaseUrl: "http://localhost:5000/api"
     };
   }
 

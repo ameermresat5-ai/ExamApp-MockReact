@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "db:init": "node src/db/initDb.js",
+    "db:seed": "node src/db/seedHybrid.js",
+    "db:check": "node src/db/checkConnection.js",
+    "db:users-exams": "node src/db/queryUsersExams.js",
+    "db:exam-questions": "node src/db/readExamQuestions.js",
+    "db:jsonb": "node src/db/queryJsonb.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14",
+    "pg": "^8.21.0"
+  },
+  "type": "module"
+}

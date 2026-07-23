@@ -1,12 +1,51 @@
-// שירות הגשות של סטודנטים.
-// השירות מחשב ציון, שומר הגשה ובודק אם הסטודנט כבר הגיש מבחן.
-
 import { mockDbService } from "./MockDbService";
 import { loggerService } from "./LoggerService";
 import { notifyService } from "./NotifyService";
+import { configService } from "./ConfigService";
+import { apiService } from "./ApiService";
 
 class SubmissionService {
+  constructor() {
+    this.syncInProgress = false;
+    this.lastSyncTime = 0;
+  }
+
+  isServerMode() {
+    return configService.get("dataMode") === "server";
+  }
+
+  syncSubmissionsFromServer() {
+    if (!this.isServerMode()) return;
+
+    const now = Date.now();
+
+    if (this.syncInProgress || now - this.lastSyncTime < 2000) {
+      return;
+    }
+
+    this.syncInProgress = true;
+
+    apiService
+      .get("/submissions")
+      .then((serverSubmissions) => {
+        mockDbService.saveCollection(
+          mockDbService.submissionsKey,
+          serverSubmissions
+        );
+
+        this.lastSyncTime = Date.now();
+        loggerService.info("Submissions synced from server", serverSubmissions);
+      })
+      .catch((error) => {
+        console.error("[CLIENT API] Failed to sync submissions", error);
+      })
+      .finally(() => {
+        this.syncInProgress = false;
+      });
+  }
+
   getAllSubmissions() {
+    this.syncSubmissionsFromServer();
     return mockDbService.getSubmissions();
   }
 
@@ -17,11 +56,13 @@ class SubmissionService {
   }
 
   getSubmissionForExam(studentId, examId) {
-    return this.getAllSubmissions().find(
-      (submission) =>
-        submission.studentId === studentId &&
-        submission.examId === Number(examId)
-    ) || null;
+    return (
+      this.getAllSubmissions().find(
+        (submission) =>
+          submission.studentId === studentId &&
+          submission.examId === Number(examId)
+      ) || null
+    );
   }
 
   hasStudentSubmitted(studentId, examId) {
@@ -66,6 +107,17 @@ class SubmissionService {
       grade,
       totalQuestions: exam.questions.length
     });
+
+    if (this.isServerMode()) {
+      apiService
+        .post(`/exams/${exam.id}/submit`, submission)
+        .then((serverSubmission) => {
+          loggerService.info("Exam submitted on server", serverSubmission);
+        })
+        .catch((error) => {
+          console.error("[CLIENT API] Failed to submit exam on server", error);
+        });
+    }
 
     loggerService.info("Exam submitted", submission);
     notifyService.success("Exam submitted successfully");
