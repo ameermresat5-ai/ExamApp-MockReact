@@ -1,8 +1,15 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+import {
+  activeDataSource,
+  repository
+} from "./repositories/RepositoryFactory.js";
+
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const port = Number(process.env.PORT || 5000);
 
 app.use(cors());
 app.use(express.json());
@@ -12,180 +19,198 @@ app.use((req, res, next) => {
   next();
 });
 
-let users = [
-  {
-    id: 1,
-    name: "Teacher Demo",
-    email: "teacher@example.com",
-    password: "123456",
-    role: "teacher"
-  },
-  {
-    id: 2,
-    name: "Student Demo",
-    email: "student@example.com",
-    password: "123456",
-    role: "student"
-  }
-];
+function asyncRoute(handler) {
+  return (req, res, next) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+}
 
-let exams = [
-  {
-    id: 1,
-    title: "JavaScript Basics Exam",
-    description: "Basic questions about JavaScript variables, functions, and arrays.",
-    status: "published",
-    teacherId: 1,
-    questions: [
-      {
-        id: 1,
-        text: "Which keyword is used to declare a constant in JavaScript?",
-        options: ["var", "let", "const", "static"],
-        correctAnswer: "const"
-      },
-      {
-        id: 2,
-        text: "Which method adds an item to the end of an array?",
-        options: ["push", "pop", "shift", "map"],
-        correctAnswer: "push"
-      }
-    ]
-  },
-  {
-    id: 2,
-    title: "React Introduction Exam",
-    description: "Basic questions about React components and props.",
-    status: "draft",
-    teacherId: 1,
-    questions: [
-      {
-        id: 1,
-        text: "React components return what?",
-        options: ["SQL", "HTML-like JSX", "CSS only", "JSON only"],
-        correctAnswer: "HTML-like JSX"
-      }
-    ]
-  }
-];
+function parseId(value) {
+  const id = Number(value);
 
-let submissions = [];
+  if (!Number.isFinite(id)) {
+    const error = new Error("Invalid numeric ID");
+    error.status = 400;
+    throw error;
+  }
+
+  return id;
+}
 
 app.get("/", (req, res) => {
-  res.json({ message: "Exam API server is running" });
+  res.json({
+    message: "Exam API server is running",
+    dataSource: activeDataSource
+  });
 });
 
-app.get("/api/users", (req, res) => {
-  res.json(users);
-});
+app.get(
+  "/api/health",
+  asyncRoute(async (req, res) => {
+    const exams = await repository.getExams();
 
-app.get("/api/exams", (req, res) => {
-  res.json(exams);
-});
+    res.json({
+      status: "ok",
+      dataSource: activeDataSource,
+      databaseConnected: true,
+      examCount: exams.length
+    });
+  })
+);
 
-app.get("/api/exams/:id", (req, res) => {
-  const exam = exams.find((exam) => exam.id === Number(req.params.id));
+app.get(
+  "/api/users",
+  asyncRoute(async (req, res) => {
+    const users = await repository.getUsers();
+    res.json(users);
+  })
+);
 
-  if (!exam) {
-    return res.status(404).json({ error: "Exam not found" });
+app.get(
+  "/api/exams",
+  asyncRoute(async (req, res) => {
+    const exams = await repository.getExams();
+    res.json(exams);
+  })
+);
+
+app.get(
+  "/api/exams/:id",
+  asyncRoute(async (req, res) => {
+    const exam = await repository.getExamById(
+      parseId(req.params.id)
+    );
+
+    if (!exam) {
+      return res.status(404).json({
+        error: "Exam not found"
+      });
+    }
+
+    res.json(exam);
+  })
+);
+
+app.post(
+  "/api/exams",
+  asyncRoute(async (req, res) => {
+    const exam = await repository.createExam(req.body);
+    res.status(201).json(exam);
+  })
+);
+
+app.put(
+  "/api/exams/:id",
+  asyncRoute(async (req, res) => {
+    const exam = await repository.updateExam(
+      parseId(req.params.id),
+      req.body
+    );
+
+    if (!exam) {
+      return res.status(404).json({
+        error: "Exam not found"
+      });
+    }
+
+    res.json(exam);
+  })
+);
+
+app.delete(
+  "/api/exams/:id",
+  asyncRoute(async (req, res) => {
+    const deleted = await repository.deleteExam(
+      parseId(req.params.id)
+    );
+
+    if (!deleted) {
+      return res.status(404).json({
+        error: "Exam not found"
+      });
+    }
+
+    res.json({
+      message: "Exam deleted"
+    });
+  })
+);
+
+app.get(
+  "/api/submissions",
+  asyncRoute(async (req, res) => {
+    const submissions =
+      await repository.getSubmissions();
+
+    res.json(submissions);
+  })
+);
+
+app.get(
+  "/api/students/:studentId/submissions",
+  asyncRoute(async (req, res) => {
+    const submissions =
+      await repository.getStudentSubmissions(
+        parseId(req.params.studentId)
+      );
+
+    res.json(submissions);
+  })
+);
+
+app.get(
+  "/api/exams/:id/grades",
+  asyncRoute(async (req, res) => {
+    const submissions =
+      await repository.getExamGrades(
+        parseId(req.params.id)
+      );
+
+    res.json(submissions);
+  })
+);
+
+app.post(
+  "/api/exams/:id/submit",
+  asyncRoute(async (req, res) => {
+    const submission =
+      await repository.createSubmission(
+        parseId(req.params.id),
+        req.body
+      );
+
+    if (!submission) {
+      return res.status(404).json({
+        error: "Exam not found"
+      });
+    }
+
+    res.status(201).json(submission);
+  })
+);
+
+app.use((error, req, res, next) => {
+  console.error("[SERVER ERROR]", error);
+
+  if (
+    error.code === "23505" ||
+    error.code === "DUPLICATE_SUBMISSION"
+  ) {
+    return res.status(409).json({
+      error: "Student already submitted this exam"
+    });
   }
 
-  res.json(exam);
+  res.status(error.status || 500).json({
+    error: error.message || "Internal server error"
+  });
 });
 
-app.post("/api/exams", (req, res) => {
-  const newExam = {
-    ...req.body,
-    id: req.body.id || Date.now(),
-    submissions: undefined
-  };
-
-  exams.push(newExam);
-
-  console.log("[SERVER] Exam created:", newExam);
-
-  res.status(201).json(newExam);
-});
-
-app.put("/api/exams/:id", (req, res) => {
-  const examIndex = exams.findIndex((exam) => exam.id === Number(req.params.id));
-
-  if (examIndex === -1) {
-    return res.status(404).json({ error: "Exam not found" });
-  }
-
-  exams[examIndex] = {
-    ...exams[examIndex],
-    ...req.body
-  };
-
-  console.log("[SERVER] Exam updated:", exams[examIndex]);
-
-  res.json(exams[examIndex]);
-});
-
-app.delete("/api/exams/:id", (req, res) => {
-  const oldLength = exams.length;
-
-  exams = exams.filter((exam) => exam.id !== Number(req.params.id));
-  submissions = submissions.filter(
-    (submission) => submission.examId !== Number(req.params.id)
+app.listen(port, () => {
+  console.log(
+    `[SERVER] Running on http://localhost:${port}`
   );
-
-  if (exams.length === oldLength) {
-    return res.status(404).json({ error: "Exam not found" });
-  }
-
-  console.log("[SERVER] Exam deleted:", req.params.id);
-
-  res.json({ message: "Exam deleted" });
-});
-
-app.post("/api/exams/:id/submit", (req, res) => {
-  const exam = exams.find((exam) => exam.id === Number(req.params.id));
-
-  if (!exam) {
-    return res.status(404).json({ error: "Exam not found" });
-  }
-
-  const submission = {
-    ...req.body,
-    id: req.body.id || Date.now(),
-    examId: Number(req.params.id),
-    examTitle: req.body.examTitle || exam.title,
-    studentId: req.body.studentId || 2,
-    answers: req.body.answers || {},
-    grade: req.body.grade ?? 0,
-    totalQuestions: req.body.totalQuestions ?? exam.questions.length,
-    submittedAt: req.body.submittedAt || new Date().toISOString()
-  };
-
-  submissions.push(submission);
-
-  console.log("[SERVER] Exam submitted:", submission);
-
-  res.status(201).json(submission);
-});
-
-app.get("/api/submissions", (req, res) => {
-  res.json(submissions);
-});
-
-app.get("/api/students/:studentId/submissions", (req, res) => {
-  const studentSubmissions = submissions.filter(
-    (submission) => submission.studentId === Number(req.params.studentId)
+  console.log(
+    `[SERVER] Active data source: ${activeDataSource}`
   );
-
-  res.json(studentSubmissions);
-});
-
-app.get("/api/exams/:id/grades", (req, res) => {
-  const examSubmissions = submissions.filter(
-    (submission) => submission.examId === Number(req.params.id)
-  );
-
-  res.json(examSubmissions);
-});
-
-app.listen(PORT, () => {
-  console.log(`[SERVER] Server running on http://localhost:${PORT}`);
 });
