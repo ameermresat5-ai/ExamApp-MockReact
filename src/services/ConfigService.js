@@ -1,13 +1,23 @@
-// שירות הגדרות כללי של המערכת.
-// כאן נשמרים ערכים קבועים כמו שם האפליקציה, גרסה וקידומת לשמירה ב-localStorage.
-
 class ConfigService {
   constructor() {
+    const requestedMode =
+      import.meta.env.VITE_DATA_MODE || "client";
+
+    const supportedModes = ["client", "server"];
+
     this.config = {
       appName: "ExamApp Mock React",
       version: "1.0.0",
       storagePrefix: "examapp_mock_react",
-      defaultRole: "student"
+      defaultRole: "student",
+
+      dataMode: supportedModes.includes(requestedMode)
+        ? requestedMode
+        : "client",
+
+      apiBaseUrl:
+        import.meta.env.VITE_API_BASE_URL ||
+        "http://localhost:5000/api"
     };
   }
 
